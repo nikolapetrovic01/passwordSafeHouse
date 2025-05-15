@@ -20,10 +20,18 @@ class CardWidget(QWidget):
         card_box.setFixedSize(130, 130)
 
         card_box.setStyleSheet("""
-            background-color: #f5f5f5;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-        """)
+                    QWidget {
+                        background-color: #f5f5f5;
+                        border: 1px solid #ccc;
+                        border-radius: 10px;
+                    }
+                    QWidget:hover {
+                        background-color: #e0e0e0;
+                        border: 1px solid #999;
+                    }
+                """)
+
+        card_box.setAttribute(Qt.WidgetAttribute.WA_Hover, True)
 
         card_layout = QVBoxLayout(card_box)
         card_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
