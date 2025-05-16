@@ -1,7 +1,7 @@
 # gui/main_window.py
 from PyQt6.QtWidgets import (
-    QWidget, QLabel, QVBoxLayout, QGridLayout,
-    QPushButton, QDialog, QDialogButtonBox, QVBoxLayout
+    QWidget, QLabel, QVBoxLayout, QGridLayout, 
+    QDialog, QDialogButtonBox, QVBoxLayout, QLineEdit, QDialogButtonBox
 )
 from PyQt6.QtCore import Qt
 from gui.CardWidget import CardWidget
@@ -66,12 +66,27 @@ class MainWindow(QWidget):
         dialog.resize(300,200)
 
         layout = QVBoxLayout()
-        layout.addWidget(QLabel(f"Username: TBA"))
-        layout.addWidget(QLabel(f"Password: TBA"))
+        # Input fields
+        username_input = QLineEdit()
+        username_input.setPlaceholderText("Username")
+        layout.addWidget(QLabel("Username"))
+        layout.addWidget(username_input)
 
-        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok)
-        buttons.accepted.connect(dialog.accept)
+        password_input = QLineEdit()
+        password_input.setPlaceholderText("Password")
+        password_input.setEchoMode(QLineEdit.EchoMode.Password)
+        layout.addWidget(QLabel("Password"))
+        layout.addWidget(password_input)
+
+        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Save)
         layout.addWidget(buttons)
+
+        # When Save is pressed
+        def on_save():
+            print("Username:", username_input.text())
+            print("Password:", password_input.text())
+            dialog.accept()
         
+        buttons.accepted.connect(on_save)
         dialog.setLayout(layout)
         dialog.exec()
