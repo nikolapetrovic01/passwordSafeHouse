@@ -7,6 +7,8 @@ from PyQt6.QtCore import Qt
 from gui.CardWidget import CardWidget
 from PyQt6.QtGui import QIcon
 from gui.add_card_widget import AddCardWidget
+from core.storage import load_credentials, save_credentials
+from core.models import Credential
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -22,25 +24,39 @@ class MainWindow(QWidget):
         grid_layout = QGridLayout()
         main_layout.addLayout(grid_layout)
 
+        # Load credentials from JSON file
+        self.credentials: list[Credential] = load_credentials()
+
+        # 🔹 If empty, add some dummy entries (optional)
+        if not self.credentials:
+            self.credentials = [
+                Credential(name="Gmail", icon="gui/icons/gmail.png", username="you@gmail.com", password="abc123"),
+                Credential(name="Steam", icon="gui/icons/steam.png", username="gamer123", password="g4m3r"),
+                Credential(name="Facebook", icon="gui/icons/facebook.png", username="you.fb", password="fb_pass"),
+                Credential(name="GitHub", icon="gui/icons/github.png", username="yougit", password="gh_token")
+            ]
+        save_credentials(self.credentials)
+
+
         # Dummy credentials for now
-        credentials = [
-            {"name": "Gmail", "icon": "gui/icons/gmail.png", "username": "you@gmail.com", "password": "abc123"},
-            {"name": "Steam", "icon": "gui/icons/steam.png", "username": "gamer123", "password": "g4m3r"},
-            {"name": "Facebook", "icon": "gui/icons/facebook.png", "username": "you.fb", "password": "fb_pass"},
-            {"name": "GitHub", "icon": "gui/icons/github.png", "username": "yougit", "password": "gh_token"}
-        ]
+        # credentials = [
+        #     {"name": "Gmail", "icon": "gui/icons/gmail.png", "username": "you@gmail.com", "password": "abc123"},
+        #     {"name": "Steam", "icon": "gui/icons/steam.png", "username": "gamer123", "password": "g4m3r"},
+        #     {"name": "Facebook", "icon": "gui/icons/facebook.png", "username": "you.fb", "password": "fb_pass"},
+        #     {"name": "GitHub", "icon": "gui/icons/github.png", "username": "yougit", "password": "gh_token"}
+        # ]
 
         # Add regular cards to the grid
-        for i, cred in enumerate(credentials):
+        for i, cred in enumerate(self.credentials):
             row = i // 3 # 3 Cards per row
             col = i % 3
 
-            card = CardWidget(cred, self.open_card_dialog)
+            card = CardWidget(cred.__dict__, self.open_card_dialog)
             grid_layout.addWidget(card,row,col)
 
         # Add the "Add New" card always last
-        add_row = len(credentials) // 3
-        add_col = len(credentials) % 3
+        add_row = len(self.credentials) // 3
+        add_col = len(self.credentials) % 3
         add_card = AddCardWidget(self.open_add_dialog)
         grid_layout.addWidget(add_card, add_row, add_col)
 
@@ -83,10 +99,39 @@ class MainWindow(QWidget):
 
         # When Save is pressed
         def on_save():
-            print("Username:", username_input.text())
-            print("Password:", password_input.text())
+            new_cred = Credential(
+                name="New Entry",  # You can extend the dialog to ask for name/icon later
+                username=username_input.text(),
+                password=password_input.text(),
+                icon=""
+            )
+            self.credentials.append(new_cred)
+            save_credentials(self.credentials)
+
+            grid_layout: QGridLayout = self.layout().itemAt(0).layout()
+
+            # Remove the "+" card from the grid
+            add_card_item = grid_layout.itemAtPosition(len(self.credentials) // 3, len(self.credentials) % 3)
+
+            if add_card_item:
+                widget = add_card_item.widget()
+                if widget:
+                    widget.setParent(None)
+
+            # Add the new card
+            row = (len(self.credentials) - 1) // 3
+            col = (len(self.credentials) - 1) % 3
+            new_card = CardWidget(new_cred.__dict__, self.open_card_dialog)
+            grid_layout.addWidget(new_card, row, col)
+
+            # Add the "+" card again at the end
+            add_row = len(self.credentials) // 3
+            add_col = len(self.credentials) % 3
+            add_card = AddCardWidget(self.open_add_dialog)
+            grid_layout.addWidget(add_card, add_row, add_col)
+
             dialog.accept()
-        
+
         buttons.accepted.connect(on_save)
         dialog.setLayout(layout)
         dialog.exec()
