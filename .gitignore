@@ -13,3 +13,7 @@ Thumbs.db
 # Output
 *.exe
 *.spec
+
+# Data
+resources/*.enc
+data.json

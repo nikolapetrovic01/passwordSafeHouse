@@ -28,6 +28,7 @@ class MainWindow(QWidget):
         self.credentials: list[Credential] = load_credentials()
 
         # 🔹 If empty, add some dummy entries (optional)
+        # TODO: REMOVE
         if not self.credentials:
             self.credentials = [
                 Credential(name="Gmail", icon="gui/icons/gmail.png", username="you@gmail.com", password="abc123"),
@@ -36,15 +37,6 @@ class MainWindow(QWidget):
                 Credential(name="GitHub", icon="gui/icons/github.png", username="yougit", password="gh_token")
             ]
         save_credentials(self.credentials)
-
-
-        # Dummy credentials for now
-        # credentials = [
-        #     {"name": "Gmail", "icon": "gui/icons/gmail.png", "username": "you@gmail.com", "password": "abc123"},
-        #     {"name": "Steam", "icon": "gui/icons/steam.png", "username": "gamer123", "password": "g4m3r"},
-        #     {"name": "Facebook", "icon": "gui/icons/facebook.png", "username": "you.fb", "password": "fb_pass"},
-        #     {"name": "GitHub", "icon": "gui/icons/github.png", "username": "yougit", "password": "gh_token"}
-        # ]
 
         # Add regular cards to the grid
         for i, cred in enumerate(self.credentials):
@@ -82,7 +74,13 @@ class MainWindow(QWidget):
         dialog.resize(300,200)
 
         layout = QVBoxLayout()
+        
         # Input fields
+        name_input = QLineEdit()
+        name_input.setPlaceholderText("Name")
+        layout.addWidget(QLabel("Name"))
+        layout.addWidget(name_input)
+
         username_input = QLineEdit()
         username_input.setPlaceholderText("Username")
         layout.addWidget(QLabel("Username"))
@@ -100,7 +98,7 @@ class MainWindow(QWidget):
         # When Save is pressed
         def on_save():
             new_cred = Credential(
-                name="New Entry",  # You can extend the dialog to ask for name/icon later
+                name=name_input.text(),
                 username=username_input.text(),
                 password=password_input.text(),
                 icon=""
