@@ -2,7 +2,6 @@ from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
 
-
 class CardWidget(QWidget):
     def __init__(self, cred, on_click_callback):
         super().__init__()

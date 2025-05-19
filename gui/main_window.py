@@ -1,42 +1,51 @@
 # gui/main_window.py
+
 from PyQt6.QtWidgets import (
     QWidget, QLabel, QVBoxLayout, QGridLayout, 
-    QDialog, QDialogButtonBox, QVBoxLayout, QLineEdit, QDialogButtonBox
+    QDialog, QDialogButtonBox, QVBoxLayout, 
+    QLineEdit, QDialogButtonBox, QMenuBar, QMenu, QMainWindow
 )
 from PyQt6.QtCore import Qt
-from gui.CardWidget import CardWidget
-from PyQt6.QtGui import QIcon
+from gui.card_widget import CardWidget
+from PyQt6.QtGui import QIcon, QAction
 from gui.add_card_widget import AddCardWidget
 from core.storage import load_credentials, save_credentials
 from core.models import Credential
 
-class MainWindow(QWidget):
+class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Password Safe House")
         self.setWindowIcon(QIcon("gui/icons/safeAppIcon.png"))  # <-- Custom icon
         self.resize(800,600)
 
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
         main_layout = QVBoxLayout()
         main_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
-        self.setLayout(main_layout)
+        central_widget.setLayout(main_layout)
         
+        # Top Menu Bar
+        menu_bar = QMenuBar()
+        self.setMenuBar(menu_bar)
+
+        options_menu = QMenu("Options", self)
+        menu_bar.addMenu(options_menu)
+
+        action_save_to_db = QAction("Save backup", self)
+        #action_save_to_db.triggered.connect("TODO") #TODO
+        options_menu.addAction(action_save_to_db)
+
+        action_restore_from_db = QAction("Load backup", self)
+        #action_restore_from_db.triggered.connect("TODO") #TODO
+        options_menu.addAction(action_restore_from_db)
+
+        # Cards grid
         grid_layout = QGridLayout()
         main_layout.addLayout(grid_layout)
 
         # Load credentials from JSON file
         self.credentials: list[Credential] = load_credentials()
-
-        # 🔹 If empty, add some dummy entries (optional)
-        # TODO: REMOVE
-        if not self.credentials:
-            self.credentials = [
-                Credential(name="Gmail", icon="gui/icons/gmail.png", username="you@gmail.com", password="abc123"),
-                Credential(name="Steam", icon="gui/icons/steam.png", username="gamer123", password="g4m3r"),
-                Credential(name="Facebook", icon="gui/icons/facebook.png", username="you.fb", password="fb_pass"),
-                Credential(name="GitHub", icon="gui/icons/github.png", username="yougit", password="gh_token")
-            ]
-        save_credentials(self.credentials)
 
         # Add regular cards to the grid
         for i, cred in enumerate(self.credentials):

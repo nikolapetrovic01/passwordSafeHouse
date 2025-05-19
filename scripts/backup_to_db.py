@@ -1,5 +1,4 @@
 import mysql.connector
-print("USING mysql.connector FROM:", mysql.connector.__file__)
 from datetime import datetime
 import os
 
